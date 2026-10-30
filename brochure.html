@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+    :root {
+      --green: #169535;
+      --green-dim: #00c832;
+      --green-dark: #003b0f;
+      --green-glow: rgba(0,255,65,0.25);
+      --bg: #000000;
+      --bg2: #030a03;
+      --scan: rgba(0,255,65,0.03);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--green);
+      font-family: 'Share Tech Mono', monospace;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── Scanlines overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 9999;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        var(--scan) 2px,
+        var(--scan) 4px
+      );
+    }
+
+    /* ── Matrix rain canvas ── */
+    #matrix-bg {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0; opacity: 0.07;
+      pointer-events: none;
+    }
+
+    /* ── All content above matrix ── */
+    .above { position: relative; z-index: 1; }
+
+    /* ── Glitch text animation ── */
+    @keyframes glitch {
+      0%,100% { text-shadow: 0 0 10px var(--green), 0 0 30px var(--green); clip-path: none; transform: none; }
+      2%       { transform: translate(-3px, 1px); clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%); }
+      4%       { transform: translate(3px, -1px); clip-path: none; }
+      6%       { transform: translate(-2px, 2px); text-shadow: -3px 0 #ff0040, 3px 0 #00ffff, 0 0 20px var(--green); }
+      8%       { transform: none; text-shadow: 0 0 10px var(--green), 0 0 30px var(--green); }
+    }
+
+    .glitch {
+      animation: glitch 4s infinite;
+    }
+
+    /* ── Terminal blink ── */
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+    .blink { animation: blink 1s step-start infinite; }
+
+    /* ── Glow text ── */
+    .glow { text-shadow: 0 0 8px var(--green), 0 0 20px var(--green), 0 0 40px var(--green-dim); }
+    .glow-sm { text-shadow: 0 0 6px var(--green), 0 0 14px var(--green-dim); }
+
+    /* ── Border glow ── */
+    .border-glow {
+      border: 1px solid var(--green-dim);
+      box-shadow: 0 0 12px var(--green-glow), inset 0 0 12px rgba(0,255,65,0.04);
+    }
+    .border-glow:hover {
+      box-shadow: 0 0 28px var(--green-glow), inset 0 0 20px rgba(0,255,65,0.08);
+      border-color: var(--green);
+      transition: all 0.3s;
+    }
+
+    /* ── Type animation ── */
+    @keyframes typing {
+      from { width: 0; }
+      to   { width: 100%; }
+    }
+
+    /* ── Pulse ring ── */
+    @keyframes pulse-ring {
+      0%   { transform: scale(1);   opacity: 1; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+
+    /* ── Sections ── */
+    section { padding: 90px 0; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(0,0,0,0.92);
+      border-bottom: 1px solid rgba(0,255,65,0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    /* ── Card ── */
+    .card {
+      background: rgba(0,20,5,0.7);
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    /* ── CTA buttons ── */
+    .btn-primary {
+      display: inline-block;
+      padding: 14px 36px;
+      background: transparent;
+      border: 2px solid var(--green);
+      color: var(--green);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--green);
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      z-index: -1;
+    }
+    .btn-primary:hover { color: #000; text-shadow: none; }
+    .btn-primary:hover::before { transform: translateX(0); }
+
+    /* ── Progress bar ── */
+    .prog-bar {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--green), transparent);
+      animation: progAnim 2s ease infinite;
+    }
+    @keyframes progAnim {
+      0%   { transform: scaleX(0); transform-origin: left; }
+      50%  { transform: scaleX(1); transform-origin: left; }
+      51%  { transform: scaleX(1); transform-origin: right; }
+      100% { transform: scaleX(0); transform-origin: right; }
+    }
+
+    /* ── Grid ── */
+    .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .g2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; }
+    @media(max-width:768px){
+      .g3,.g2 { grid-template-columns:1fr; }
+      .hero-h { font-size:36px !important; }
+      .hide-mobile { display:none; }
+    }
+
+    /* ── Stat counter ── */
+    .stat-big {
+      font-family: 'Orbitron', monospace;
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    /* ── Flicker ── */
+    @keyframes flicker {
+      0%,19%,21%,23%,25%,54%,56%,100% { opacity:1; }
+      20%,24%,55% { opacity:0.4; }
+    }
+    .flicker { animation: flicker 5s infinite; }
+
+    /* ── Terminal window ── */
+    .terminal {
+      background: #000;
+      border: 1px solid var(--green-dim);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .terminal-bar {
+      background: #001a05;
+      padding: 8px 14px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid rgba(0,255,65,0.15);
+    }
+    .dot { width:10px; height:10px; border-radius:50%; }
+
+    /* ── Week timeline ── */
+    .day-row {
+      display: flex; gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(0,255,65,0.08);
+      align-items: flex-start;
+    }
+    .day-row:last-child { border-bottom: none; }
+
+    /* ── Scroll reveal ── */
+    .reveal { opacity:0; transform:translateY(24px); transition: all 0.6s ease; }
+    .reveal.in { opacity:1; transform:translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- Matrix rain -->
+<canvas id="matrix-bg"></canvas>
+
+<!-- ══ NAV ══ -->
+<nav class="above">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding-top:14px;padding-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:10px;height:10px;background:var(--green);border-radius:50%;position:relative;">
+        <div style="position:absolute;inset:0;border-radius:50%;background:var(--green);animation:pulse-ring 1.5s ease infinite;"></div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:rgba(0,255,65,0.5);letter-spacing:0.1em;" class="hide-mobile">
+      [ SYSTEM ONLINE ] &nbsp;|&nbsp; COHORT_02 OPEN
+    </div>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="above" style="min-height:100vh;display:flex;align-items:center;padding:0;background:radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0,40,10,0.6) 0%, #000 70%);">
+  <div class="container" style="padding-top:60px;padding-bottom:60px;">
+
+    <!-- terminal header -->
+    <div style="font-size:12px;color:rgba(0,255,65,0.4);letter-spacing:0.08em;margin-bottom:20px;">
+    </div>
+
+    <h1 class="hero-h glitch glow" style="font-family:'Orbitron',monospace;font-size:62px;font-weight:900;letter-spacing:-1px;line-height:1.1;margin-bottom:28px;">
+      WE ARE<br/>
+      <span style="color:var(--green);">POWER.</span>
+    </h1>
+
+    <p style="font-size:18px;color:rgba(0,255,65,0.7);line-height:1.8;max-width:600px;margin-bottom:12px;">
+      Not the arrogant kind.<br/>
+      The <strong style="color:var(--green);">unstoppable</strong> kind.
+    </p>
+
+    <p style="font-size:14px;color:rgba(0,255,65,0.45);line-height:1.9;max-width:580px;margin-bottom:48px;">
+      We respect individual Consciousness, Power, Quality, Talents to make modern world for Humans and their presence<br/>
+      A <strong style="color:var(--green-dim);"></strong> that transforms unemployed, directionless youth into resilient, creative, capable humans — by asking questions society never dared to ask.
+    </p>
+
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:72px;">
+      <a href="#program" class="btn-primary" style="letter-spacing:0.15em;"> ENTER THE PROGRAM</a>
+      <a href="#join" class="btn-primary" style="border-color:rgba(0,255,65,0.3);color:rgba(0,255,65,0.5);letter-spacing:0.15em;">Contact</a>
+    </div>
+
+    <!-- Stats row -->
+    <div style="display:flex;gap:0;border:1px solid rgba(0,255,65,0.15);overflow:hidden;max-width:700px;flex-wrap:wrap;">
+      <div style="flex:1;padding:28px 32px;border-right:1px solid rgba(0,255,65,0.12);min-width:140px;">
+        <div class="stat-big glow flicker">32</div>
+        <div style="font-size:11px;color:rgba(0,255,65,0.4);letter-spacing:0.12em;margin-top:8px;">DAYS PROGRAM</div>
+      </div>
+      <div style="flex:1;padding:28px 32px;border-right:1px solid rgba(0,255,65,0.12);min-width:140px;">
+        <div class="stat-big glow flicker" style="animation-delay:0.5s;">0</div>
+        <div style="font-size:11px;color:rgba(0,255,65,0.4);letter-spacing:0.12em;margin-top:8px;">BLIND JUDGEMENTS</div>
+      </div>
+      <div style="flex:1;padding:28px 32px;min-width:140px;">
+        <div class="stat-big glow flicker" style="animation-delay:1s;">∞</div>
+        <div style="font-size:11px;color:rgba(0,255,65,0.4);letter-spacing:0.12em;margin-top:8px;">LIMITS DESTROYED</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ PROBLEM ══ -->
+<section class="above" style="background:#000;border-top:1px solid rgba(0,255,65,0.1);">
+  <div class="container">
+    <div style="margin-bottom:56px;">
+      <h2 style="font-family:'Orbitron',monospace;font-size:36px;font-weight:700;letter-spacing:2px;" class="glow-sm">
+        THE Discipline.
+      </h2>
+    </div>
+
+    <div class="g3">
+      <div class="card border-glow reveal" style="padding:28px;">
+        <h3 style="font-size:16px;letter-spacing:1px;margin-bottom:12px;" class="glow-sm">Body and Mind</h3>
+        <p style="font-size:13px;color:rgba(0,255,65,0.5);line-height:1.8;">"There is more wisdom in your body than in your deepest philosophy. A healthy, strong body is the ground upon which great thoughts and a powerful life are built."</p>
+      </div>
+      <div class="card border-glow reveal" style="padding:28px;animation-delay:0.1s;">
+        <h3 style="font-size:16px;letter-spacing:1px;margin-bottom:12px;" class="glow-sm">WORK LIFE BALANCE</h3>
+        <p style="font-size:13px;color:rgba(0,255,65,0.5);line-height:1.8;">Remember, Everything for the family.</p>
+      </div>
+      <div class="card border-glow reveal" style="padding:28px;animation-delay:0.2s;">
+        <h3 style="font-size:16px;letter-spacing:1px;margin-bottom:12px;" class="glow-sm">POTENTIAL LEFT IDLE</h3>
+        <p style="font-size:13px;color:rgba(0,255,65,0.5);line-height:1.8;">Years of drift. Confidence corrupted. Talent untapped. Not because you lacked power — because no one handed you the right commands.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ WHAT WE DO ══ -->
+<section class="above" style="background:var(--bg2);border-top:1px solid rgba(0,255,65,0.1);">
+  <div class="container">
+    <!-- terminal window -->
+    <div class="terminal reveal" style="margin-bottom:64px;">
+      <div class="terminal-bar">
+        <div class="dot" style="background:#ff5f56;"></div>
+        <div class="dot" style="background:#ffbd2e;"></div>
+        <div class="dot" style="background:#27c93f;"></div>
+      </div>
+      <div style="padding:24px 28px;font-size:13px;line-height:2.2;">
+        <div><span style="color:rgba(0,255,65,0.4);">$</span> <span style="color:var(--green);">run</span> deep_discovery_interview --no-judgement --layer=infinite</div>
+        <div><span style="color:rgba(0,255,65,0.4);">$</span> <span style="color:var(--green);">deploy</span> human --state=resilient,creative,powerful</div>
+        <div style="margin-top:8px;color:var(--green);" class="glow-sm">...INITIALIZED. <span class="blink">▌</span></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:56px;">
+      <div style="font-size:11px;color:rgba(0,255,65,0.4);letter-spacing:0.2em;margin-bottom:14px;">// HOW_WE_OPERATE.sh</div>
+      <h2 style="font-family:'Orbitron',monospace;font-size:34px;font-weight:700;letter-spacing:2px;" class="glow-sm">
+        WE DON'T GIVE ANSWERS.<br/>WE EXECUTE BETTER QUERIES.
+      </h2>
+    </div>
+
+    <div class="g2">
+      <div class="card border-glow reveal" style="padding:32px;">
+        <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:24px;">
+          <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--green);min-width:40px;" class="glow-sm">01</div>
+          <div>
+            <h3 style="font-size:15px;letter-spacing:2px;margin-bottom:10px;">DEEP DISCOVERY INTERVIEW</h3>
+            <p style="font-size:13px;color:rgba(0,255,65,0.5);line-height:1.8;"> human coaches run layered, adaptive conversations — digging past fear, family pressure, and confusion to surface the real you. No forms. No checkboxes. Raw, honest dialogue.</p>
+          </div>
+        </div>
+        <div class="prog-bar"></div>
+      </div>
+      <div class="card border-glow reveal" style="padding:32px;animation-delay:0.3s;">
+        <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:24px;">
+          <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--green);min-width:40px;" class="glow-sm">02</div>
+          <div>
+            <h3 style="font-size:15px;letter-spacing:2px;margin-bottom:10px;">SKILL ACCELERATION</h3>
+            <p style="font-size:13px;color:rgba(0,255,65,0.5);line-height:1.8;">Technology-driven learning, live Partners, and real-world projects — all locked onto your passion track.</p>
+          </div>
+        </div>
+        <div class="prog-bar" style="animation-delay:1s;"></div>
+      </div>
+
+      <div class="card border-glow reveal" style="padding:32px;animation-delay:0.45s;">
+        <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:24px;">
+          <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--green);min-width:40px;" class="glow-sm">03</div>
+          <div>
+            <h3 style="font-size:15px;letter-spacing:2px;margin-bottom:10px;">DEPLOY INTO THE REAL WORLD</h3>
+            <p style="font-size:13pAI +x;color:rgba(0,255,65,0.5);line-height:1.8;">With a portfolio, roadmap, and network. Enter hiring partners, freelance markets, and startup ecosystems aligned to your true path. You leave with proof with certificate</p>
+          </div>
+        </div>
+        <div class="prog-bar" style="animation-delay:1.5s;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 14-DAY PROGRAM ══ -->
+<section class="above" style="background:#000;border-top:1px solid rgba(0,255,65,0.1);" id="program">
+  <div class="container">
+    <div style="margin-bottom:56px;">
+      <div style="font-size:11px;color:rgba(0,255,65,0.4);letter-spacing:0.2em;margin-bottom:14px;">// nearly everthing       for now-tech, psychology, learning, philosophy, hacking</div>
+      <h2 style="font-family:'Orbitron',monospace;font-size:34px;font-weight:700;letter-spacing:2px;" class="glow-sm">
+        TOPICS WE ARE IN
+      </h2>
+    </div>
+
+    <div class="g2">
+      <!-- Week 1 -->
+      <div>
+        <div style="padding:10px 18px;border:1px solid var(--green-dim);display:inline-block;margin-bottom:28px;font-family:'Orbitron',monospace;font-size:13px;letter-spacing:3px;" class="glow-sm">HUMAN</div>
+        <div>
+          <div class="day-row">
+            <div style="font-size:11px;color:var(--green);letter-spacing:0.1em;min-width:80px;padding-top:2px;">DAY 01–03</div>
+            <div>
+              <div style="font-size:13px;letter-spacing:1px;margin-bottom:4px;">DEEP DISCOVERY</div>
+              <div style="font-size:12px;color:rgba(0,255,65,0.4);line-height:1.7;">We question your question and answers, interest, survival ability because we need to create environment for like get power, respect then money.</div>
+            </div>
+          </div>
+          <div class="day-row">
+            <div style="font-size:11px;color:var(--green);letter-spacing:0.1em;min-width:80px;padding-top:2px;">DAY 04–06</div>
+            <div>
+              <div style="font-size:13px;letter-spacing:1px;margin-bottom:4px;">KNOWLEDGE AND WISDOM</div>
+              <div style="font-size:12px;color:rgba(0,255,65,0.4);line-height:1.7;">It very helpful practice for understanding the individuals help them in situation and keep stay strong.</div>
+            </div>
+          </div>
+          <div class="day-row">
+            <div style="font-size:11px;color:var(--green);letter-spacing:0.1em;min-width:80px;padding-top:2px;">DAY 07–12</div>
+            <div>
+              <div style="font-size:13px;letter-spacing:1px;margin-bottom:4px;">RECREATIONAL PERIOD</div>
+              <div style="font-size:12px;color:rgba(0,255,65,0.4);line-height:1.7;">We give you a time to being truely yourself to get off all of hurdles of your subconscious.</div>
+            </div>
+          </div>
+          <div class="day-row">
+            <div style="font-size:11px;color:var(--green);letter-spacing:0.1em;min-width:80px;padding-top:2px;">DAY 13–14</div>
+            <div>
+              <div style="font-size:13px;letter-spacing:1px;margin-bottom:4px;">SAFE INNOVATION & BETTER LIFE</div>
+              <div style="font-size:12px;color:rgba(0,255,65,0.4);line-height:1.7;">Creation is part of humanity that creation should keep people united and to save them</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Week 2 -->
+      <div>
+        <div style="padding:10px 18px;border:1px solid var(--green-dim);display:inline-block;margin-bottom:28px;font-family:'Orbitron',monospace;font-size:13px;letter-spacing:3px;" class="glow-sm">TECHNOLOGY</div>
+        <div>
+          <div class="day-row">
+            <div style="font-size:11px;color:var(--green);letter-spacing:0.1em;min-width:80px;padding-top:2px;">DAY 15–20</div>
+            <div>
+              <div style="font-size:13px;letter-spacing:1px;margin-bottom:4px;">UNDERSTAND THE TECHNOLOGY AND ITS BENEFITS [THE SUPER SPRINT] </div>
+              <div style="font-size:12px;color:rgba(0,255,65,0.4);line-height:1.7;">The sophisticated technical explaination from the root of the technology story to current latest released projects and how peoples can use their creativity and achieve </div>
+            </div>
+          </div>
+          <div class="day-row">
+            <div style="font-size:11px;color:var(--green);letter-spacing:0.1em;min-width:80px;padding-top:2px;">DAY 21–30</div>
+            <div>
+              <div style="font-size:13px;letter-spacing:1px;margin-bottom:4px;">YOU CREATE YOUR VISON, We push you</div>
+              <div style="font-size:12px;color:rgba(0,255,65,0.4);line-height:1.7;">We dont let you enter hurdle, we help you, also letting you help yourself </div>
+            </div>
+          </div>
+          <div class="day-row">
+            <div style="font-size:11px;color:var(--green);letter-spacing:0.1em;min-width:80px;padding-top:2px;">DAY 31–12</div>
+            <div>
+              <div style="font-size:13px;letter-spacing:1px;margin-bottom:4px;">A COMPREHENSIVE CREATION PERIOD</div>
+              <div style="font-size:12px;color:rgba(0,255,65,0.4);line-height:1.7;">This is where you will artifact your idea to comprehensive product .</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ OUTPUT: WHO YOU BECOME ══ -->
+<section class="above" style="background:var(--bg2);border-top:1px solid rgba(0,255,65,0.1);">
+  <div class="container" style="text-align:center;">
+    <div style="font-size:11px;color:rgba(0,255,65,0.4);letter-spacing:0.2em;margin-bottom:14px;">// EXPECTED_OUTPUT.config</div>
+    <h2 style="font-family:'Orbitron',monospace;font-size:34px;font-weight:700;letter-spacing:2px;margin-bottom:16px;" class="glow-sm">
+      YOU WILL BECOME
+    </h2>
+    <p style="font-size:13px;color:rgba(0,255,65,0.4);margin-bottom:64px;">Three attributes hardcoded into everyone.</p>
+
+    <div class="g3">
+      <div class="card border-glow reveal" style="padding:40px 28px;">
+        <h3 style="font-family:'Orbitron',monospace;font-size:18px;letter-spacing:3px;margin-bottom:16px;" class="glow-sm">RESILIENT</h3>
+        <p style="font-size:13px;color:rgba(0,255,65,0.45);line-height:1.9;">Rejection won't crash you. Confusion won't paralyze you. You'll be wired to absorb pressure and convert it into forward motion.</p>
+      </div>
+      <div class="card border-glow reveal" style="padding:40px 28px;animation-delay:0.15s;border-color:var(--green);box-shadow:0 0 30px var(--green-glow),inset 0 0 20px rgba(0,255,65,0.06);">
+        <h3 style="font-family:'Orbitron',monospace;font-size:18px;letter-spacing:3px;margin-bottom:16px;" class="glow">MEGALOMANIAC</h3>
+        <p style="font-size:13px;color:rgba(0,255,65,0.65);line-height:1.9;">Unstoppable vision. Grandiose thinking. The conviction that you are capable of something extraordinary — because you actually are.</p>
+      </div>
+      <div class="card border-glow reveal" style="padding:40px 28px;animation-delay:0.3s;">
+        <h3 style="font-family:'Orbitron',monospace;font-size:18px;letter-spacing:3px;margin-bottom:16px;" class="glow-sm">CREATIVE</h3>
+        <p style="font-size:13px;color:rgba(0,255,65,0.45);line-height:1.9;">Your unique thinking is your weapon. We sharpen it. Problems become puzzles. Limitations become launchpads.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:48px;padding:28px;border:1px solid rgba(0,255,65,0.15);max-width:700px;margin-left:auto;margin-right:auto;text-align:left;">
+      <div style="font-size:11px;color:rgba(0,255,65,0.3);margin-bottom:10px;">// FINAL_STATE_ASSERTION</div>
+      <div style="font-size:15px;line-height:2.2;">
+        <span style="color:rgba(0,255,65,0.35);">assert</span> humans.are_powerful() <span style="color:rgba(0,255,65,0.35);">==</span> <span class="glow" style="color:var(--green);">True</span><br/>
+        <span style="color:rgba(0,255,65,0.35);">assert</span> humans.knows_direction() <span style="color:rgba(0,255,65,0.35);">==</span> <span class="glow" style="color:var(--green);">True</span><br/>
+        <span class="blink" style="color:rgba(0,255,65,0.3);"># All tests passed. ✔</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<section class="above" style="background:#000;border-top:1px solid rgba(0,255,65,0.1);" id="join">
+  <div class="container" style="text-align:center;">
+
+    <div style="font-size:11px;color:rgba(0,255,65,0.4);letter-spacing:0.2em;margin-bottom:20px;">// ACCESS_REQUEST.exe</div>
+
+    <h2 style="font-family:'Orbitron',monospace;font-size:44px;font-weight:900;letter-spacing:1px;line-height:1.15;margin-bottom:24px;" class="glitch glow">
+    <br/>START STUNTING.
+    </h2>
+
+    <p style="font-size:14px;color:rgba(0,255,65,0.5);max-width:500px;margin:0 auto 48px;line-height:1.9;">
+      Your passion is not a daydream. It is a direction.<br/>
+      Human-guided with well artifacted manner. Zero compromise.
+    </p>
+
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:48px;">
+      <a href="mailto:hello@ignite.io" class="btn-primary" style="font-size:14px;letter-spacing:0.15em;padding:16px 42px;">APPLY NOW — FREE START</a>
+      <a href="mailto:partner@ignite.io" class="btn-primary" style="border-color:rgba(0,255,65,0.25);color:rgba(0,255,65,0.4);font-size:14px;letter-spacing:0.12em;padding:16px 42px;">BOOK DISCOVERY CALL</a>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:36px;flex-wrap:wrap;font-size:12px;color:rgba(0,255,65,0.3);letter-spacing:0.1em;">
+      <span>[ OFFLINE only ]</span>
+      <span>[ ONLINE not available now ]</span>
+      <span>[ NO EXPERIENCE NEEDED ]</span>
+      <span>[ JUDGMENT-FREE ]</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="above" style="background:#000;border-top:1px solid rgba(0,255,65,0.1);padding:32px 0;">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+    <div style="font-size:11px;color:rgba(0,255,65,0.25);letter-spacing:0.08em;">gmail</div>
+  </div>
+</footer>
+
+
+<!-- ══ SCRIPTS ══ -->
+<script>
+  /* Matrix rain */
+  const canvas = document.getElementById('matrix-bg');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const cols = Math.floor(canvas.width / 18);
+  const drops = Array(cols).fill(1);
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?アイウエオカキクケコサシスセソタチツテトナニヌネノ';
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#00ff41';
+    ctx.font = '14px Share Tech Mono, monospace';
+    drops.forEach((y, i) => {
+      const ch = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(ch, i * 18, y * 18);
+      if (y * 18 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    });
+  }
+  setInterval(drawMatrix, 50);
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  /* Scroll reveal */
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+</script>
+
+</body>
+</html>
